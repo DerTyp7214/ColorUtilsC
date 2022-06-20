@@ -13,10 +13,16 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
         externalNativeBuild {
             cmake {
-                cppFlags ""
+                arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_static"
+                cFlags "-D__STDC_FORMAT_MACROS", "-fno-integrated-as"
             }
+        }
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
     }
 
