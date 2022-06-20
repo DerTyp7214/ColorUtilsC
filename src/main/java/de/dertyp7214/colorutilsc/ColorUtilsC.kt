@@ -4,15 +4,15 @@ import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "MemberVisibilityCanBePrivate")
 object ColorUtilsC {
     fun init() {
         System.loadLibrary("colorutilsc")
     }
 
-    private const val XYZ_WHITE_REFERENCE_X = 95.047
-    private const val XYZ_WHITE_REFERENCE_Y = 100.0
-    private const val XYZ_WHITE_REFERENCE_Z = 108.883
+    const val XYZ_WHITE_REFERENCE_X = 95.047
+    const val XYZ_WHITE_REFERENCE_Y = 100.0
+    const val XYZ_WHITE_REFERENCE_Z = 108.883
 
     /**
      * Extracts the alpha component of the given color
