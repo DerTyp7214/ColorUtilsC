@@ -6,7 +6,6 @@ plugins {
 android {
     namespace 'de.dertyp7214.colorutilsc'
     compileSdk 33
-    ndkVersion '25.0.8528842'
 
     defaultConfig {
         minSdk 24
