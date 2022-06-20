@@ -285,3 +285,12 @@ Java_de_dertyp7214_colorutilsc_ColorUtilsC_distanceEuclidean(
 ) {
     return distanceEuclidean(lab_x, lab_y);
 }
+
+JNIEXPORT jint JNICALL
+Java_de_dertyp7214_colorutilsc_ColorUtilsC_setAlphaComponent(
+        __attribute__((unused)) JNIEnv *env,
+        __attribute__((unused)) jobject class,
+        jint color, jint alpha
+) {
+    return setAlphaComponent(color, alpha);
+}

@@ -82,6 +82,15 @@ object ColorUtilsC {
         @IntRange(from = 0x0, to = 0xFF) b: Int
     ): Int
 
+    /**
+     * Set the alpha component of {@code color} to be {@code alpha}.
+     */
+    @ColorInt
+    external fun setAlphaComponent(
+        @ColorInt color: Int,
+        @IntRange(from=0x0,to=0xFF) alpha: Int
+    ): Int
+
     external fun constrain(
         amount: Float,
         low: Float,

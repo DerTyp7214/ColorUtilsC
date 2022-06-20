@@ -53,6 +53,10 @@ static int compositeColors(int foreground, int background) {
     return argb(a, r, g, b);
 }
 
+static int setAlphaComponent(int color, int alpha) {
+    return (color & 0x00FFFFFF) | (alpha << 24);
+}
+
 static double distanceEuclidean(double labX[3], double labY[3]) {
     return sqrt(
             pow(labX[0] - labY[0], 2)
