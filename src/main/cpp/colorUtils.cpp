@@ -168,9 +168,9 @@ Java_de_dertyp7214_colorutilsc_ColorUtilsC_RGBToHSL(
         jint r, jint g, jint b, jfloatArray out_hsl
 ) {
     int size = 3;
-    float hsl[size];
-    RGBToHSL(r, g, b, hsl);
-    env->SetFloatArrayRegion(out_hsl, 0, size, hsl);
+    float HSL[size];
+    RGBToHSL(r, g, b, HSL);
+    env->SetFloatArrayRegion(out_hsl, 0, size, HSL);
 }
 
 JNIEXPORT void JNICALL

@@ -158,34 +158,34 @@ static void RGBToHSL(int r, int g, int b, float outHsl[3]) {
     float bf = b / 255.0;
 
     float max = fmax(rf, fmax(gf, bf));
-    float min = fmax(rf, fmin(gf, bf));
+    float min = fmin(rf, fmin(gf, bf));
     float deltaMaxMin = max - min;
 
     float h, s;
-    float l = (max + min) / 2.0;
+    float l = (max + min) / 2;
 
     if (max == min) {
-        h = s = 0.0;
+        h = s = 0;
     } else {
         if (max == rf) {
-            h = fmodf((gf - bf) / deltaMaxMin, 6);
+            h = fmod((gf - bf) / deltaMaxMin, 6);
         } else if (max == gf) {
             h = ((bf - rf) / deltaMaxMin) + 2;
         } else {
             h = ((rf - gf) / deltaMaxMin) + 4;
         }
 
-        s = deltaMaxMin / (1 - fabsf(2 * expm1f(l)));
+        s = deltaMaxMin / (1 - fabs(2 * l - 1));
     }
 
-    h = fmodf(h * 60, 360);
+    h = fmod(h * 60, 360);
     if (h < 0) {
         h += 360;
     }
 
-    outHsl[0] = (int) constrain(h, 0, 360);
-    outHsl[1] = (int) constrain(s, 0, 1);
-    outHsl[2] = (int) constrain(l, 0, 1);
+    outHsl[0] = constrain(h, 0, 360);
+    outHsl[1] = constrain(s, 0, 1);
+    outHsl[2] = constrain(l, 0, 1);
 }
 
 static void LABToXYZ(double l, double a, double b, double outXyz[3]) {
