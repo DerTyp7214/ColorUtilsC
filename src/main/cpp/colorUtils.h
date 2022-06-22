@@ -4,6 +4,12 @@ static double XYZ_WHITE_REFERENCE_Z = 108.883;
 static double XYZ_EPSILON = 0.008856;
 static double XYZ_KAPPA = 903.3;
 
+const static int MODE_YIQ = 0;
+const static int MODE_CMYK = 1;
+const static int MODE_XYZ = 2;
+const static int MODE_LAB = 3;
+const static int MODE_HSL = 4;
+
 static int alpha(int color) {
     return (int) ((unsigned int) (color) >> 24);
 }
@@ -26,6 +32,17 @@ static int rgb(int r, int g, int b) {
 
 static int argb(int a, int r, int g, int b) {
     return (a << 24) | (r << 16) | (g << 8) | b;
+}
+
+static float max(float a, float b, float c) {
+    if (a > b && a > c)
+        return a;
+    if (b > a && b > c)
+        return b;
+    if (c > a && c > b)
+        return c;
+
+    return a;
 }
 
 static float constrain(float amount, float low, float high) {
@@ -76,6 +93,36 @@ static int blendARGB(int color1, int color2, float ratio) {
 
 static double pivotXyzComponent(double component) {
     return component > XYZ_EPSILON ? powf(component, 1 / 3.0) : (XYZ_KAPPA * component + 16) / 116;
+}
+
+static void RGBToYIQ(int r, int g, int b, int outYIQ[3]) {
+    outYIQ[0] = .299 * r + .587 * g + .114 * b;
+    outYIQ[1] = .596 * r + .275 * g + .321 * b;
+    outYIQ[2] = .212 * r + .523 * g + .311 * b;
+}
+
+static void YIQToRGB(int y, int i, int q, int outRGB[3]) {
+    outRGB[0] = y + .956 * i + .621 * q;
+    outRGB[1] = y - .272 * i - .647 * q;
+    outRGB[2] = y - 1.106 * i + 1.703 * q;
+}
+
+static void RGBToCMYK(int r, int g, int b, double outCMYK[4]) {
+    float fr = r / 255;
+    float fg = g / 255;
+    float fb = b / 255;
+
+    outCMYK[3] = 1 - max(fr, fg, fb);
+
+    outCMYK[0] = (1 - fr - outCMYK[3]) / (1 - outCMYK[3]);
+    outCMYK[1] = (1 - fg - outCMYK[3]) / (1 - outCMYK[3]);
+    outCMYK[2] = (1 - fb - outCMYK[3]) / (1 - outCMYK[3]);
+}
+
+static void CMYKToRGB(double c, double m, double y, double k, int outRGB[3]) {
+    outRGB[0] = 255 * (1 - c / 100) * (1 - k / 100);
+    outRGB[1] = 255 * (1 - m / 100) * (1 - k / 100);
+    outRGB[2] = 255 * (1 - y / 100) * (1 - k / 100);
 }
 
 static void RGBToXYZ(int r, int g, int b, double outXyz[3]) {
@@ -156,6 +203,18 @@ static void LABToXYZ(double l, double a, double b, double outXyz[3]) {
     outXyz[0] = xr * XYZ_WHITE_REFERENCE_X;
     outXyz[1] = yr * XYZ_WHITE_REFERENCE_Y;
     outXyz[2] = zr * XYZ_WHITE_REFERENCE_Z;
+}
+
+static int YIQToColor(int y, int i, int q) {
+    int RGB[3];
+    YIQToRGB(y, i, q, RGB);
+    return rgb(RGB[0], RGB[1], RGB[2]);
+}
+
+static int CMYKToColor(double c, double m, double y, double k) {
+    int RGB[3];
+    CMYKToRGB(c, m, y, k, RGB);
+    return rgb(RGB[0], RGB[1], RGB[2]);
 }
 
 static int XYZToColor(double x, double y, double z) {
@@ -246,6 +305,12 @@ static void colorToHSL(int color, float outHsl[3]) {
     RGBToHSL(red(color), green(color), blue(color), outHsl);
 }
 
+static void colorToRGB(int color, int outRGB[3]) {
+    outRGB[0] = red(color);
+    outRGB[1] = green(color);
+    outRGB[2] = blue(color);
+}
+
 static double calculateColorDifference(int a, int b) {
     double lab1[3] = {0, 0, 0};
     double lab2[3] = {0, 0, 0};
@@ -277,4 +342,48 @@ static int invertColor(int color) {
     int g = green(color);
     int b = blue(color);
     return argb(a, a - r, a - g, a - b);
+}
+
+static int transformColor(int color, int mode) {
+    int r = red(color);
+    int g = green(color);
+    int b = blue(color);
+
+    double output[3] = {
+            static_cast<double>(r),
+            static_cast<double>(g),
+            static_cast<double>(b)
+    };
+    double output4[4];
+    switch (mode) {
+        case MODE_YIQ:
+            RGBToYIQ(r, g, b, (int *) output);
+            break;
+        case MODE_CMYK:
+            RGBToCMYK(r, g, b, output4);
+            output[0] = output4[0] * 2.55;
+            output[1] = output4[2] * 2.55;
+            output[2] = output4[2] * 2.55;
+            break;
+        case MODE_HSL:
+            RGBToHSL(r, g, b, (float *) output);
+            output[0] = output[0] / 360 * 255;
+            output[1] = output[1] * 255;
+            output[2] = output[2] * 255;
+            break;
+        case MODE_LAB:
+            RGBToLAB(r, g, b, output);
+            output[0] = output[0] * 2.55;
+            output[1] = output[1] + 128;
+            output[2] = output[2] + 128;
+            break;
+        case MODE_XYZ:
+            RGBToXYZ(r, g, b, output);
+            output[0] = output[0] / XYZ_WHITE_REFERENCE_X * 255;
+            output[1] = output[1] / XYZ_WHITE_REFERENCE_Y * 255;
+            output[2] = output[2] / XYZ_WHITE_REFERENCE_Z * 255;
+            break;
+    }
+
+    return rgb(output[0], output[1], output[2]);
 }

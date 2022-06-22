@@ -13,6 +13,14 @@ object ColorUtilsC {
     const val XYZ_WHITE_REFERENCE_X = 95.047
     const val XYZ_WHITE_REFERENCE_Y = 100.0
     const val XYZ_WHITE_REFERENCE_Z = 108.883
+    const val XYZ_EPSILON = 0.008856
+    const val XYZ_KAPPA = 903.3
+
+    const val COLOR_MODE_YIQ = 0
+    const val COLOR_MODE_CMYK = 1
+    const val COLOR_MODE_XYZ = 2
+    const val COLOR_MODE_LAB = 3
+    const val COLOR_MODE_HSL = 4
 
     /**
      * Extracts the alpha component of the given color
@@ -88,7 +96,7 @@ object ColorUtilsC {
     @ColorInt
     external fun setAlphaComponent(
         @ColorInt color: Int,
-        @IntRange(from=0x0,to=0xFF) alpha: Int
+        @IntRange(from = 0x0, to = 0xFF) alpha: Int
     ): Int
 
     external fun constrain(
@@ -96,12 +104,6 @@ object ColorUtilsC {
         low: Float,
         high: Float
     ): Float
-
-    external fun constrain(
-        amount: Int,
-        low: Int,
-        high: Int
-    ): Int
 
     external fun compositeAlpha(foregroundAlpha: Int, backgroundAlpha: Int): Int
 
@@ -126,15 +128,102 @@ object ColorUtilsC {
     external fun pivotXyzComponent(component: Double): Double
 
     /**
+     * Convert RGB components to its YIQ representative components.
+     *
+     * <ul>
+     * <li>outYIQ[0] is Y [0, 255]</li>
+     * <li>outYIQ[1] is I [0, 255]</li>
+     * <li>outYIQ[2] is Q [0, 255]</li>
+     * </ul>
+     *
+     * @param r red component value [0, 255]
+     * @param g green component value [0, 255]
+     * @param b blue component value [0, 255]
+     * @param outYIQ 3-element array which holds the resulting YIQ components
+     */
+    external fun RGBToYIQ(
+        @IntRange(from = 0x0, to = 0xFF) r: Int,
+        @IntRange(from = 0x0, to = 0xFF) g: Int,
+        @IntRange(from = 0x0, to = 0xFF) b: Int,
+        outYIQ: IntArray
+    )
+
+    /**
+     * Convert YIQ components to its RGB representative components.
+     *
+     * <ul>
+     * <li>outRGB[0] is R [0, 255]</li>
+     * <li>outRGB[1] is G [0, 255]</li>
+     * <li>outRGB[2] is B [0, 255]</li>
+     * </ul>
+     *
+     * @param y y component value [0, 255]
+     * @param i i component value [0, 255]
+     * @param q q component value [0, 255]
+     * @param outRGB 3-element array which holds the resulting RGB components
+     */
+    external fun YIQToRGB(
+        @IntRange(from = 0x0, to = 0xFF) y: Int,
+        @IntRange(from = 0x0, to = 0xFF) i: Int,
+        @IntRange(from = 0x0, to = 0xFF) q: Int,
+        outRGB: IntArray
+    )
+
+    /**
+     * Convert RGB components to its CMYK representative components.
+     *
+     * <ul>
+     * <li>outCMYK[0] is C [0%, 100%]</li>
+     * <li>outCMYK[1] is M [0%, 100%]</li>
+     * <li>outCMYK[2] is Y [0%, 100%]</li>
+     * <li>outCMYK[3] is K [0%, 100%]</li>
+     * </ul>
+     *
+     * @param r red component value [0, 255]
+     * @param g green component value [0, 255]
+     * @param b blue component value [0, 255]
+     * @param outCMYK 4-element array which holds the resulting CMYK components
+     */
+    external fun RGBToCMYK(
+        @IntRange(from = 0x0, to = 0xFF) r: Int,
+        @IntRange(from = 0x0, to = 0xFF) g: Int,
+        @IntRange(from = 0x0, to = 0xFF) b: Int,
+        outCMYK: DoubleArray
+    )
+
+    /**
+     * Convert CMYK components to its RGB representative components.
+     *
+     * <ul>
+     * <li>outRGB[0] is R [0, 255]</li>
+     * <li>outRGB[1] is G [0, 255]</li>
+     * <li>outRGB[2] is B [0, 255]</li>
+     * </ul>
+     *
+     * @param c cyan component value [0%, 100%]
+     * @param m magenta component value [0%, 100%]
+     * @param y yellow component value [0%, 100%]
+     * @param k black component value [0%, 100%]
+     * @param outRGB 3-element array which holds the resulting RGB components
+     */
+    external fun CMYKToRGB(
+        @FloatRange(from = .0, to = 100.0) c: Double,
+        @FloatRange(from = .0, to = 100.0) m: Double,
+        @FloatRange(from = .0, to = 100.0) y: Double,
+        @FloatRange(from = .0, to = 100.0) k: Double,
+        outRGB: IntArray
+    )
+
+    /**
      * Convert RGB components to its CIE XYZ representative components.
      *
      * <p>The resulting XYZ representation will use the D65 illuminant and the CIE
      * 2° Standard Observer (1931).</p>
      *
      * <ul>
-     * <li>outXyz[0] is X [0, 95.047)</li>
-     * <li>outXyz[1] is Y [0, 100)</li>
-     * <li>outXyz[2] is Z [0, 108.883)</li>
+     * <li>outXyz[0] is X [0, 95.047]</li>
+     * <li>outXyz[1] is Y [0, 100]</li>
+     * <li>outXyz[2] is Z [0, 108.883]</li>
      * </ul>
      *
      * @param r red component value [0, 255]
@@ -157,13 +246,13 @@ object ColorUtilsC {
      *
      * <ul>
      * <li>outLab[0] is L [0, 100]</li>
-     * <li>outLab[1] is a [-128, 127)</li>
-     * <li>outLab[2] is b [-128, 127)</li>
+     * <li>outLab[1] is a [-128, 127]</li>
+     * <li>outLab[2] is b [-128, 127]</li>
      * </ul>
      *
-     * @param x X component value [0, 95.047)
-     * @param y Y component value [0, 100)
-     * @param z Z component value [0, 108.883)
+     * @param x X component value [0, 95.047]
+     * @param y Y component value [0, 100]
+     * @param z Z component value [0, 108.883]
      * @param outLab 3-element array which holds the resulting Lab components
      */
     external fun XYZToLab(
@@ -178,8 +267,8 @@ object ColorUtilsC {
      *
      * <ul>
      * <li>outLab[0] is L [0, 100]</li>
-     * <li>outLab[1] is a [-128, 127)</li>
-     * <li>outLab[2] is b [-128, 127)</li>
+     * <li>outLab[1] is a [-128, 127]</li>
+     * <li>outLab[2] is b [-128, 127]</li>
      * </ul>
      *
      * @param r red component value [0, 255]
@@ -197,7 +286,7 @@ object ColorUtilsC {
     /**
      * Convert RGB components to HSL (hue-saturation-lightness).
      * <ul>
-     * <li>outHsl[0] is Hue [0, 360)</li>
+     * <li>outHsl[0] is Hue [0, 360]</li>
      * <li>outHsl[1] is Saturation [0, 1]</li>
      * <li>outHsl[2] is Lightness [0, 1]</li>
      * </ul>
@@ -221,14 +310,14 @@ object ColorUtilsC {
      * 2° Standard Observer (1931).</p>
      *
      * <ul>
-     * <li>outXyz[0] is X [0, 95.047)</li>
-     * <li>outXyz[1] is Y [0, 100)</li>
-     * <li>outXyz[2] is Z [0, 108.883)</li>
+     * <li>outXyz[0] is X [0, 95.047]</li>
+     * <li>outXyz[1] is Y [0, 100]</li>
+     * <li>outXyz[2] is Z [0, 108.883]</li>
      * </ul>
      *
      * @param l L component value [0, 100]
-     * @param a A component value [-128, 127)
-     * @param b B component value [-128, 127)
+     * @param a A component value [-128, 127]
+     * @param b B component value [-128, 127]
      * @param outXyz 3-element array which holds the resulting XYZ components
      */
     external fun LABToXYZ(
@@ -237,6 +326,37 @@ object ColorUtilsC {
         @FloatRange(from = -128.0, to = 127.0) b: Double,
         outXyz: DoubleArray
     )
+
+    /**
+     * Converts a color from YIQ to its RGB representation.
+     *
+     * @param y y component value [0, 255]
+     * @param i i component value [0, 255]
+     * @param q q component value [0, 255]
+     * @return int containing the RGB representation
+     */
+    external fun YIQToColor(
+        @IntRange(from = 0x0, to = 0xFF) y: Int,
+        @IntRange(from = 0x0, to = 0xFF) i: Int,
+        @IntRange(from = 0x0, to = 0xFF) q: Int,
+    ): Int
+
+    /**
+     * Converts a color from CMYK to its RGB representation.
+     *
+     * @param c cyan component value [0%, 100%]
+     * @param m magenta component value [0%, 100%]
+     * @param y yellow component value [0%, 100%]
+     * @param k black component value [0%, 100%]
+     * @return int containing the RGB representation
+     */
+    @ColorInt
+    external fun CMYKToColor(
+        @FloatRange(from = .0, to = 100.0) c: Double,
+        @FloatRange(from = .0, to = 100.0) m: Double,
+        @FloatRange(from = .0, to = 100.0) y: Double,
+        @FloatRange(from = .0, to = 100.0) k: Double
+    ): Int
 
     /**
      * Converts a color from CIE Lab to its RGB representation.
@@ -259,9 +379,9 @@ object ColorUtilsC {
      * <p>This method expects the XYZ representation to use the D65 illuminant and the CIE
      * 2° Standard Observer (1931).</p>
      *
-     * @param x X component value [0, 95.047)
-     * @param y Y component value [0, 100)
-     * @param z Z component value [0, 108.883)
+     * @param x X component value [0, 95.047]
+     * @param y Y component value [0, 100]
+     * @param z Z component value [0, 108.883]
      * @return int containing the RGB representation
      */
     @ColorInt
@@ -274,7 +394,7 @@ object ColorUtilsC {
     /**
      * Convert HSL (hue-saturation-lightness) components to a RGB color.
      * <ul>
-     * <li>hsl[0] is Hue [0, 360)</li>
+     * <li>hsl[0] is Hue [0, 360]</li>
      * <li>hsl[1] is Saturation [0, 1]</li>
      * <li>hsl[2] is Lightness [0, 1]</li>
      * </ul>
@@ -304,9 +424,9 @@ object ColorUtilsC {
      * 2° Standard Observer (1931).</p>
      *
      * <ul>
-     * <li>outXyz[0] is X [0, 95.047)</li>
-     * <li>outXyz[1] is Y [0, 100)</li>
-     * <li>outXyz[2] is Z [0, 108.883)</li>
+     * <li>outXyz[0] is X [0, 95.047]</li>
+     * <li>outXyz[1] is Y [0, 100]</li>
+     * <li>outXyz[2] is Z [0, 108.883]</li>
      * </ul>
      *
      * @param color the ARGB color to convert. The alpha component is ignored
@@ -320,7 +440,7 @@ object ColorUtilsC {
     /**
      * Convert the ARGB color to its HSL (hue-saturation-lightness) components.
      * <ul>
-     * <li>outHsl[0] is Hue [0, 360)</li>
+     * <li>outHsl[0] is Hue [0, 360]</li>
      * <li>outHsl[1] is Saturation [0, 1]</li>
      * <li>outHsl[2] is Lightness [0, 1]</li>
      * </ul>
@@ -331,6 +451,22 @@ object ColorUtilsC {
     external fun colorToHSL(
         @ColorInt color: Int,
         outHsl: FloatArray
+    )
+
+    /**
+     * Convert the ARGB color to its RGB components.
+     * <ul>
+     * <li>outRGB[0] is R [0, 255]</li>
+     * <li>outRGB[1] is G [0, 255]</li>
+     * <li>outRGB[2] is B [0, 255]</li>
+     * </ul>
+     *
+     * @param color the ARGB color to convert. The alpha component is ignored
+     * @param outRGB 3-element array which holds the resulting RGB components
+     */
+    external fun colorToRGB(
+        @ColorInt color: Int,
+        outRGB: IntArray
     )
 
     /**
@@ -388,5 +524,18 @@ object ColorUtilsC {
         @ColorInt color1: Int,
         @ColorInt color2: Int,
         @FloatRange(from = .0, to = 1.0) ratio: Float
+    ): Int
+
+    /**
+     * Transforms color to other colorspace
+     *
+     * @param color the input color
+     * @param mode the transform mode
+     * @return the transformed color
+     */
+    @ColorInt
+    external fun transformColor(
+        @ColorInt color: Int,
+        mode: Int
     ): Int
 }
