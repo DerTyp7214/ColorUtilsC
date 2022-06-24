@@ -76,9 +76,9 @@ static int setAlphaComponent(int color, int alpha) {
 
 static double distanceEuclidean(double labX[3], double labY[3]) {
     return sqrt(
-            pow(labX[0] - labY[0], 2)
-            + pow(labX[1] - labY[1], 2)
-            + pow(labX[2] - labY[2], 2)
+            pow(labX[0] - labY[0], 2) +
+            pow(labX[1] - labY[1], 2) +
+            pow(labX[2] - labY[2], 2)
     );
 }
 
@@ -92,7 +92,7 @@ static int blendARGB(int color1, int color2, float ratio) {
 }
 
 static double pivotXyzComponent(double component) {
-    return component > XYZ_EPSILON ? powf(component, 1 / 3.0) : (XYZ_KAPPA * component + 16) / 116;
+    return component > XYZ_EPSILON ? pow(component, (double) 1 / 3) : (XYZ_KAPPA * component + 16) / 116;
 }
 
 static void RGBToYIQ(int r, int g, int b, int outYIQ[3]) {
@@ -126,12 +126,12 @@ static void CMYKToRGB(double c, double m, double y, double k, int outRGB[3]) {
 }
 
 static void RGBToXYZ(int r, int g, int b, double outXyz[3]) {
-    double sr = r / 255.0;
-    sr = sr < 0.04045 ? sr / 12.92 : powf((sr + 0.055) / 1.055, 2.4);
-    double sg = g / 255.0;
-    sg = sg < 0.04045 ? sg / 12.92 : powf((sg + 0.055) / 1.055, 2.4);
-    double sb = b / 255.0;
-    sb = sb < 0.04045 ? sb / 12.92 : powf((sb + 0.055) / 1.055, 2.4);
+    double sr = (double) r / 255;
+    sr = sr < 0.04045 ? sr / 12.92 : pow((sr + 0.055) / 1.055, 2.4);
+    double sg = (double)g / 255;
+    sg = sg < 0.04045 ? sg / 12.92 : pow((sg + 0.055) / 1.055, 2.4);
+    double sb = (double)b / 255;
+    sb = sb < 0.04045 ? sb / 12.92 : pow((sb + 0.055) / 1.055, 2.4);
 
     outXyz[0] = 100 * (sr * 0.4124 + sg * 0.3576 + sb * 0.1805);
     outXyz[1] = 100 * (sr * 0.2126 + sg * 0.7152 + sb * 0.0722);
@@ -175,7 +175,7 @@ static void RGBToHSL(int r, int g, int b, float outHsl[3]) {
             h = ((rf - gf) / deltaMaxMin) + 4;
         }
 
-        s = deltaMaxMin / (1 - fabs(2 * l - 1));
+        s = deltaMaxMin / (1 - abs(2 * l - 1));
     }
 
     h = fmod(h * 60, 360);
@@ -193,11 +193,11 @@ static void LABToXYZ(double l, double a, double b, double outXyz[3]) {
     double fx = a / 500 + fy;
     double fz = fy - b / 200;
 
-    double tmp = powf(fx, 3);
+    double tmp = pow(fx, 3);
     double xr = tmp > XYZ_EPSILON ? tmp : (116 * fx - 16) / XYZ_KAPPA;
-    double yr = l > XYZ_KAPPA * XYZ_EPSILON ? powf(fy, 3) : l / XYZ_KAPPA;
+    double yr = l > XYZ_KAPPA * XYZ_EPSILON ? pow(fy, 3) : l / XYZ_KAPPA;
 
-    tmp = powf(fz, 3);
+    tmp = pow(fz, 3);
     double zr = tmp > XYZ_EPSILON ? tmp : (116 * fz - 16) / XYZ_KAPPA;
 
     outXyz[0] = xr * XYZ_WHITE_REFERENCE_X;
@@ -222,14 +222,14 @@ static int XYZToColor(double x, double y, double z) {
     double g = (x * -0.9689 + y * 1.8758 + z * 0.0415) / 100;
     double b = (x * 0.0557 + y * -0.2040 + z * 1.0570) / 100;
 
-    r = r > 0.0031308 ? 1.055 * powf(r, 1 / 2.4) - 0.055 : 12.92 * r;
-    g = g > 0.0031308 ? 1.055 * powf(g, 1 / 2.4) - 0.055 : 12.92 * g;
-    b = b > 0.0031308 ? 1.055 * powf(b, 1 / 2.4) - 0.055 : 12.92 * b;
+    r = r > 0.0031308 ? 1.055 * pow(r, 1 / 2.4) - 0.055 : 12.92 * r;
+    g = g > 0.0031308 ? 1.055 * pow(g, 1 / 2.4) - 0.055 : 12.92 * g;
+    b = b > 0.0031308 ? 1.055 * pow(b, 1 / 2.4) - 0.055 : 12.92 * b;
 
     return rgb(
-            constrain((int) roundf(r * 255), 0, 255),
-            constrain((int) roundf(g * 255), 0, 255),
-            constrain((int) roundf(b * 255), 0, 255)
+            constrain((int) round(r * 255), 0, 255),
+            constrain((int) round(g * 255), 0, 255),
+            constrain((int) round(b * 255), 0, 255)
     );
 }
 
@@ -244,9 +244,9 @@ static int HSLToColor(float hsl[3]) {
     float s = hsl[1];
     float l = hsl[2];
 
-    float c = (1 - fabsf(2 * l - 1)) * s;
+    float c = (1 - abs(2 * l - 1)) * s;
     float m = l - .5 * c;
-    float x = c * (1 - fabsf(fmodf(h / 60, 2) - 1));
+    float x = c * (1 - abs(fmod(h / 60, 2) - 1));
 
     int hueSegment = (int) h / 60;
 
@@ -254,35 +254,35 @@ static int HSLToColor(float hsl[3]) {
 
     switch (hueSegment) {
         case 0:
-            r = (int) roundf(255 * (c + m));
-            g = (int) roundf(255 * (x + m));
-            b = (int) roundf(255 * m);
+            r = (int) round(255 * (c + m));
+            g = (int) round(255 * (x + m));
+            b = (int) round(255 * m);
             break;
         case 1:
-            r = (int) roundf(255 * (x + m));
-            g = (int) roundf(255 * (c + m));
-            b = (int) roundf(255 * m);
+            r = (int) round(255 * (x + m));
+            g = (int) round(255 * (c + m));
+            b = (int) round(255 * m);
             break;
         case 2:
-            r = (int) roundf(255 * m);
-            g = (int) roundf(255 * (c + m));
-            b = (int) roundf(255 * (x + m));
+            r = (int) round(255 * m);
+            g = (int) round(255 * (c + m));
+            b = (int) round(255 * (x + m));
             break;
         case 3:
-            r = (int) roundf(255 * m);
-            g = (int) roundf(255 * (x + m));
-            b = (int) roundf(255 * (c + m));
+            r = (int) round(255 * m);
+            g = (int) round(255 * (x + m));
+            b = (int) round(255 * (c + m));
             break;
         case 4:
-            r = (int) roundf(255 * (x + m));
-            g = (int) roundf(255 * m);
-            b = (int) roundf(255 * (c + m));
+            r = (int) round(255 * (x + m));
+            g = (int) round(255 * m);
+            b = (int) round(255 * (c + m));
             break;
         case 5:
         case 6:
-            r = (int) roundf(255 * (c + m));
-            g = (int) roundf(255 * m);
-            b = (int) roundf(255 * (x + m));
+            r = (int) round(255 * (c + m));
+            g = (int) round(255 * m);
+            b = (int) round(255 * (x + m));
             break;
     }
 
@@ -316,7 +316,11 @@ static double calculateColorDifference(int a, int b) {
     double lab2[3] = {0, 0, 0};
     colorToLAB(a, lab1);
     colorToLAB(b, lab2);
-    return sqrt(pow(lab2[0] - lab1[0], 2) + pow(lab2[1] - lab1[1], 2) + pow(lab2[2] - lab1[2], 2));
+    return sqrt(
+            pow(lab2[0] - lab1[0], 2) +
+            pow(lab2[1] - lab1[1], 2) +
+            pow(lab2[2] - lab1[2], 2)
+    );
 }
 
 static double calculateLuminance(int color) {
@@ -333,7 +337,7 @@ static double calculateContrast(int foreground, int background) {
     double luminance1 = calculateLuminance(foreground) + .05;
     double luminance2 = calculateLuminance(background) + .05;
 
-    return fmaxf(luminance1, luminance2) / fminf(luminance1, luminance2);
+    return fmax(luminance1, luminance2) / fmin(luminance1, luminance2);
 }
 
 static int invertColor(int color) {
