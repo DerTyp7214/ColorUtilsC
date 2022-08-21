@@ -1,3 +1,5 @@
+#include <cmath>
+
 static double XYZ_WHITE_REFERENCE_X = 95.047;
 static double XYZ_WHITE_REFERENCE_Y = 100;
 static double XYZ_WHITE_REFERENCE_Z = 108.883;
@@ -92,7 +94,8 @@ static int blendARGB(int color1, int color2, float ratio) {
 }
 
 static double pivotXyzComponent(double component) {
-    return component > XYZ_EPSILON ? pow(component, (double) 1 / 3) : (XYZ_KAPPA * component + 16) / 116;
+    return component > XYZ_EPSILON ? pow(component, (double) 1 / 3) : (XYZ_KAPPA * component + 16) /
+                                                                      116;
 }
 
 static void RGBToYIQ(int r, int g, int b, int outYIQ[3]) {
@@ -128,9 +131,9 @@ static void CMYKToRGB(double c, double m, double y, double k, int outRGB[3]) {
 static void RGBToXYZ(int r, int g, int b, double outXyz[3]) {
     double sr = (double) r / 255;
     sr = sr < 0.04045 ? sr / 12.92 : pow((sr + 0.055) / 1.055, 2.4);
-    double sg = (double)g / 255;
+    double sg = (double) g / 255;
     sg = sg < 0.04045 ? sg / 12.92 : pow((sg + 0.055) / 1.055, 2.4);
-    double sb = (double)b / 255;
+    double sb = (double) b / 255;
     sb = sb < 0.04045 ? sb / 12.92 : pow((sb + 0.055) / 1.055, 2.4);
 
     outXyz[0] = 100 * (sr * 0.4124 + sg * 0.3576 + sb * 0.1805);
@@ -346,6 +349,18 @@ static int invertColor(int color) {
     int g = green(color);
     int b = blue(color);
     return argb(a, a - r, a - g, a - b);
+}
+
+static int overlayColors(int topColor, int bottomColor) {
+    int topAlpha = alpha(topColor);
+    int bottomAlpha = alpha(bottomColor);
+    int alphaSum = bottomAlpha + topAlpha;
+
+    int r = (red(bottomColor) * bottomAlpha + red(topColor) * topAlpha) / alphaSum;
+    int g = (green(bottomColor) * bottomAlpha + green(topColor) * topAlpha) / alphaSum;
+    int b = (blue(bottomColor) * bottomAlpha + blue(topColor) * topAlpha) / alphaSum;
+
+    return argb(fmin(255, alphaSum), r, g, b);
 }
 
 static int transformColor(int color, int mode) {

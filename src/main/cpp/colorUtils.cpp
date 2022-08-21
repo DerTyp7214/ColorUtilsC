@@ -1,4 +1,3 @@
-#include <cmath>
 #include <jni.h>
 #include "colorUtils.h"
 
@@ -373,4 +372,12 @@ Java_de_dertyp7214_colorutilsc_ColorUtilsC_colorToRGB(
     colorToRGB(color, RGB);
     env->SetIntArrayRegion(out_rgb, 0, size, RGB);
 }
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_de_dertyp7214_colorutilsc_ColorUtilsC_overlayColors(
+        __attribute__((unused)) JNIEnv *env,
+        __attribute__((unused)) jobject clazz,
+        jint top_color, jint bottom_color) {
+    return overlayColors(top_color, bottom_color);
 }

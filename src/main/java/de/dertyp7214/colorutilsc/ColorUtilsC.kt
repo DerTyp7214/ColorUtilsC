@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package de.dertyp7214.colorutilsc
 
 import androidx.annotation.ColorInt
@@ -537,5 +539,18 @@ object ColorUtilsC {
     external fun transformColor(
         @ColorInt color: Int,
         mode: Int
+    ): Int
+
+    /**
+     * Overlay one color on top of another
+     *
+     * @param topColor the top color
+     * @param bottomColor the bottom color
+     * @return result of top color overlayed on top of bottom color
+     */
+    @ColorInt
+    external fun overlayColors(
+        @ColorInt topColor: Int,
+        @ColorInt bottomColor: Int
     ): Int
 }
