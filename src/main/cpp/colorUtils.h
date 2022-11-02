@@ -363,6 +363,32 @@ static int overlayColors(int topColor, int bottomColor) {
     return argb(fmin(255, alphaSum), r, g, b);
 }
 
+static int associateColors(int color, int redColor, int greenColor, int blueColor) {
+    int alphaValue = alpha(color);
+
+    double redValue = red(color) / 255.0;
+    double greenValue = green(color) / 255.0;
+    double blueValue = blue(color) / 255.0;
+
+    int firstRed = red(redColor) * redValue;
+    int firstGreen = green(redColor) * redValue;
+    int firstBlue = blue(redColor) * redValue;
+
+    int secondRed = red(greenColor) * greenValue;
+    int secondGreen = green(greenColor) * greenValue;
+    int secondBlue = blue(greenColor) * greenValue;
+
+    int thirdRed = red(blueColor) * blueValue;
+    int thirdGreen = green(blueColor) * blueValue;
+    int thirdBlue = blue(blueColor) * blueValue;
+
+    int finalRed = fmin(255, firstRed + secondRed + thirdRed);
+    int finalGreen = fmin(255, firstGreen + secondGreen + thirdGreen);
+    int finalBlue = fmin(255, firstBlue + secondBlue + thirdBlue);
+
+    return argb(alphaValue, finalRed, finalGreen, finalBlue);
+}
+
 static int transformColor(int color, int mode) {
     int r = red(color);
     int g = green(color);

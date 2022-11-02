@@ -553,4 +553,21 @@ object ColorUtilsC {
         @ColorInt topColor: Int,
         @ColorInt bottomColor: Int
     ): Int
+
+    /**
+     * Associate the r, g and b values with different colors
+     *
+     * @param color the color where the rgb gets replaced
+     * @param red the color with which red should be replaced
+     * @param green the color with which green should be replaced
+     * @param blue the color with which blue should be replaced
+     * @return new color based on red, green and blue
+     */
+    @ColorInt
+    external fun associateColors(
+        @ColorInt color: Int,
+        @ColorInt red: Int,
+        @ColorInt green: Int,
+        @ColorInt blue: Int
+    ): Int
 }
