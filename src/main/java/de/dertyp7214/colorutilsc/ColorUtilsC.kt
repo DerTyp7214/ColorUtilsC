@@ -2,6 +2,7 @@
 
 package de.dertyp7214.colorutilsc
 
+import android.graphics.Bitmap
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
@@ -484,7 +485,7 @@ object ColorUtilsC {
     ): Double
 
     /**
-     * Returns the luminance of a color as a float between {@code 0.0} and {@code 1.0}.
+     * Returns the luminance of a color as a double between {@code 0.0} and {@code 1.0}.
      * <p>Defined as the Y component in the XYZ representation of {@code color}.</p>
      */
     @FloatRange(from = .0, to = 1.0)
@@ -570,4 +571,12 @@ object ColorUtilsC {
         @ColorInt green: Int,
         @ColorInt blue: Int
     ): Int
+
+    /**
+     * Calculate the luminance of a bitmap
+     *
+     * @param bitmap the bitmap to calculate the luminance of
+     * @return the luminance of the bitmap as a double between {@code 0.0} and {@code 1.0}.
+     */
+    external fun calculateBitmapLuminance(bitmap: Bitmap): Double
 }

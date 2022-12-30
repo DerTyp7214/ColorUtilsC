@@ -1,4 +1,5 @@
 #include <cmath>
+#include <android/log.h>
 
 static double XYZ_WHITE_REFERENCE_X = 95.047;
 static double XYZ_WHITE_REFERENCE_Y = 100;
@@ -431,4 +432,47 @@ static int transformColor(int color, int mode) {
     }
 
     return rgb(output[0], output[1], output[2]);
+}
+
+static double calculateBitmapLuminance(
+        JNIEnv *env,
+        jobject bitmap,
+        AndroidBitmapInfo bitmapInfo
+) {
+    try {
+        if (bitmapInfo.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+            return .0;
+        }
+
+        int width = bitmapInfo.width;
+        int height = bitmapInfo.height;
+
+        void *pixels = 0;
+        if (AndroidBitmap_lockPixels(env, bitmap, &pixels) < 0) {
+            return .0;
+        }
+
+        const int bytesPerPixel = 24 / 8;
+        const int align = 4;
+        const int RowLength = (width * bytesPerPixel + align - 1) & ~(align - 1);
+
+        double luminance = calculateLuminance(*((int *) pixels));
+
+        for (int py = 1; py < height; py++) {
+            for (int px = 0; px < width; px++) {
+                try {
+                    int *pixel = (int *) ((char *) pixels + py * RowLength + px * bytesPerPixel);
+                    luminance += calculateLuminance(*pixel);
+                } catch (...) {
+                    continue;
+                }
+            }
+        }
+
+        AndroidBitmap_unlockPixels(env, bitmap);
+
+        return luminance / (width * height);
+    } catch (...) {
+        return .0;
+    }
 }

@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <android/bitmap.h>
 #include "colorUtils.h"
 
 extern "C" {
@@ -387,5 +388,36 @@ Java_de_dertyp7214_colorutilsc_ColorUtilsC_associateColors(
         __attribute__((unused)) jobject clazz,
         jint color, jint red, jint green, jint blue) {
     return associateColors(color, red, green, blue);
+}
+
+JNIEXPORT jdouble JNICALL
+Java_de_dertyp7214_colorutilsc_ColorUtilsC_calculateBitmapLuminance(
+        __attribute__((unused)) JNIEnv *env,
+        __attribute__((unused)) jobject clazz,
+        jobject bitmap) {
+
+    if (!bitmap) {
+        return -1.0;
+    }
+
+    AndroidBitmapInfo info;
+
+    if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
+        return -2.0;
+    }
+
+    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        return -3.0;
+    }
+
+    if (!info.width || !info.height) {
+        return -4.0;
+    }
+
+    if (!info.stride) {
+        return -5.0;
+    }
+
+    return calculateBitmapLuminance(env, bitmap, info);
 }
 }
