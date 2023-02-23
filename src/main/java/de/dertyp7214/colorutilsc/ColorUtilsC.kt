@@ -5,7 +5,13 @@ package de.dertyp7214.colorutilsc
 import android.graphics.Bitmap
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
+import androidx.annotation.IntDef
 import androidx.annotation.IntRange
+import de.dertyp7214.colorutilsc.ColorUtilsC.ColorMode.Companion.COLOR_MODE_CMYK
+import de.dertyp7214.colorutilsc.ColorUtilsC.ColorMode.Companion.COLOR_MODE_HSL
+import de.dertyp7214.colorutilsc.ColorUtilsC.ColorMode.Companion.COLOR_MODE_LAB
+import de.dertyp7214.colorutilsc.ColorUtilsC.ColorMode.Companion.COLOR_MODE_XYZ
+import de.dertyp7214.colorutilsc.ColorUtilsC.ColorMode.Companion.COLOR_MODE_YIQ
 
 @Suppress("FunctionName", "MemberVisibilityCanBePrivate")
 object ColorUtilsC {
@@ -19,11 +25,18 @@ object ColorUtilsC {
     const val XYZ_EPSILON = 0.008856
     const val XYZ_KAPPA = 903.3
 
-    const val COLOR_MODE_YIQ = 0
-    const val COLOR_MODE_CMYK = 1
-    const val COLOR_MODE_XYZ = 2
-    const val COLOR_MODE_LAB = 3
-    const val COLOR_MODE_HSL = 4
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(COLOR_MODE_YIQ, COLOR_MODE_CMYK, COLOR_MODE_XYZ, COLOR_MODE_LAB, COLOR_MODE_HSL)
+    annotation class ColorMode {
+        companion object {
+            const val COLOR_MODE_YIQ = 0
+            const val COLOR_MODE_CMYK = 1
+            const val COLOR_MODE_XYZ = 2
+            const val COLOR_MODE_LAB = 3
+            const val COLOR_MODE_HSL = 4
+
+        }
+    }
 
     /**
      * Extracts the alpha component of the given color
@@ -539,7 +552,7 @@ object ColorUtilsC {
     @ColorInt
     external fun transformColor(
         @ColorInt color: Int,
-        mode: Int
+        @ColorMode mode: Int
     ): Int
 
     /**
