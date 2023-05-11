@@ -7,7 +7,8 @@ plugins {
 
 android {
     namespace 'de.dertyp7214.colorutilsc'
-    compileSdk 33
+    buildToolsVersion = "34.0.0-rc4"
+    compileSdkPreview "UpsideDownCake"
 
     defaultConfig {
         minSdk 23
