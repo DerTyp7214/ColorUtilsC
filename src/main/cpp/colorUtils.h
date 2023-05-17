@@ -367,25 +367,29 @@ static int overlayColors(int topColor, int bottomColor) {
 static int associateColors(int color, int redColor, int greenColor, int blueColor) {
     int alphaValue = alpha(color);
 
-    double redValue = red(color) / 255.0;
-    double greenValue = green(color) / 255.0;
-    double blueValue = blue(color) / 255.0;
+    int redValue = red(color);
+    int greenValue = green(color);
+    int blueValue = blue(color);
 
-    int firstRed = red(redColor) * redValue;
-    int firstGreen = green(redColor) * redValue;
-    int firstBlue = blue(redColor) * redValue;
+    int firstRed = (red(redColor) * redValue) / 255;
+    int firstGreen = (green(redColor) * redValue) / 255;
+    int firstBlue = (blue(redColor) * redValue) / 255;
 
-    int secondRed = red(greenColor) * greenValue;
-    int secondGreen = green(greenColor) * greenValue;
-    int secondBlue = blue(greenColor) * greenValue;
+    int secondRed = (red(greenColor) * greenValue) / 255;
+    int secondGreen = (green(greenColor) * greenValue) / 255;
+    int secondBlue = (blue(greenColor) * greenValue) / 255;
 
-    int thirdRed = red(blueColor) * blueValue;
-    int thirdGreen = green(blueColor) * blueValue;
-    int thirdBlue = blue(blueColor) * blueValue;
+    int thirdRed = (red(blueColor) * blueValue) / 255;
+    int thirdGreen = (green(blueColor) * blueValue) / 255;
+    int thirdBlue = (blue(blueColor) * blueValue) / 255;
 
-    int finalRed = fmin(255, firstRed + secondRed + thirdRed);
-    int finalGreen = fmin(255, firstGreen + secondGreen + thirdGreen);
-    int finalBlue = fmin(255, firstBlue + secondBlue + thirdBlue);
+    int finalRed = firstRed + secondRed + thirdRed;
+    int finalGreen = firstGreen + secondGreen + thirdGreen;
+    int finalBlue = firstBlue + secondBlue + thirdBlue;
+
+    if (finalRed > 255) finalRed = 255;
+    if (finalGreen > 255) finalGreen = 255;
+    if (finalBlue > 255) finalBlue = 255;
 
     return argb(alphaValue, finalRed, finalGreen, finalBlue);
 }
