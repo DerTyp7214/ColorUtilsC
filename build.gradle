@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'de.dertyp7214.colorutilsc'
-    buildToolsVersion = "34.0.0-rc4"
+    buildToolsVersion = "34.0.0 rc4"
     compileSdkPreview "UpsideDownCake"
 
     defaultConfig {
