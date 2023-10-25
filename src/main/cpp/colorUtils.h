@@ -1,5 +1,4 @@
 #include <cmath>
-#include <android/log.h>
 
 static double XYZ_WHITE_REFERENCE_X = 95.047;
 static double XYZ_WHITE_REFERENCE_Y = 100;

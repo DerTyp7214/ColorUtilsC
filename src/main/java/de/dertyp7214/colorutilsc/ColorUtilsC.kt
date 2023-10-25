@@ -416,7 +416,7 @@ object ColorUtilsC {
      * </ul>
      * If hsv values are out of range, they are pinned.
      *
-     * @param hsl 3-element array which holds the input HSL components
+     * @param hsl 3-value array which holds the input HSL components
      * @return the resulting RGB color
      */
     @ColorInt
@@ -560,7 +560,7 @@ object ColorUtilsC {
      *
      * @param topColor the top color
      * @param bottomColor the bottom color
-     * @return result of top color overlayed on top of bottom color
+     * @return result of top color overlay on top of bottom color
      */
     @ColorInt
     external fun overlayColors(
@@ -589,7 +589,8 @@ object ColorUtilsC {
      * Calculate the luminance of a bitmap
      *
      * @param bitmap the bitmap to calculate the luminance of
-     * @return the luminance of the bitmap as a double between {@code 0.0} and {@code 1.0}.
+     * @return the luminance of the bitmap as a double between 0.0 and 1.0
      */
+    @FloatRange(from = .0, to = 1.0)
     external fun calculateBitmapLuminance(bitmap: Bitmap): Double
 }
