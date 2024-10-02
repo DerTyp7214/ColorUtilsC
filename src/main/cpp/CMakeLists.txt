@@ -57,6 +57,3 @@ target_link_libraries( # Specifies the target library.
         -ljnigraphics)
 
 set_target_properties(colorutilsc PROPERTIES IMPORTED_LOCATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/colorutilsc.so )
-
-include(AndroidNdkModules)
-android_ndk_import_module_cpufeatures()
