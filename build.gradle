@@ -5,6 +5,7 @@ plugins {
 
 android {
     namespace 'de.dertyp7214.colorutilsc'
+    buildToolsVersion = "36.0.0 rc1"
     compileSdkPreview 'Baklava'
 
     defaultConfig {
