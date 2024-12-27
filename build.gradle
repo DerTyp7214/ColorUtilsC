@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'de.dertyp7214.colorutilsc'
-    buildToolsVersion = "36.0.0 rc1"
+    buildToolsVersion = "36.0.0 rc3"
     compileSdkPreview 'Baklava'
 
     defaultConfig {
@@ -30,7 +30,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.31.0"
+            version "3.31.1"
         }
     }
     compileOptions {
