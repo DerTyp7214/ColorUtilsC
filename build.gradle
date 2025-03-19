@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'de.dertyp7214.colorutilsc'
-    buildToolsVersion = "36.0.0 rc5"
-    compileSdkPreview 'Baklava'
+    buildToolsVersion = "36.0.0"
+    compileSdk 36
 
     defaultConfig {
         minSdk 23
-        targetSdk 35
+        targetSdk 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -30,7 +30,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.31.5"
+            version "3.31.6"
         }
     }
     compileOptions {
