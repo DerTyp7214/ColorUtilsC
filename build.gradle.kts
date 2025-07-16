@@ -9,7 +9,7 @@ android {
     namespace = "de.dertyp7214.colorutilsc"
     buildToolsVersion = "36.0.0"
     compileSdk = 36
-    ndkVersion = "28.1.13356709"
+    ndkVersion = "28.2.13676358"
     defaultConfig {
         minSdk = 23
 
