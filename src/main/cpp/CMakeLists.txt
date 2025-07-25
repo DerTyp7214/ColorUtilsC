@@ -6,7 +6,8 @@
 cmake_minimum_required(VERSION 3.31)
 
 # Declares and names the project.
-
+set( CMAKE_CXX_COMPILER "/pathto/g++" )
+set( CMAKE_C_COMPILER "/pathto/gcc" )
 project("colorutilsc")
 
 enable_language(ASM)
